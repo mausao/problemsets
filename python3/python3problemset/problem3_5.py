@@ -5,9 +5,11 @@ seqLEN = len(seqDNA)
 ecori = input("Digite a sequência da sua enzima de restrição EcoRI: ")
 ecoRIsite = ecori.upper()
 startPos = seqDNA.find(ecoRIsite)
-print(startPos)
+fimstartPos = startPos + len(ecoRIsite)
+print("A clivagem inicial se dá em: ", startPos, fimstartPos)
 seqDNAinvert = seqDNA[::-1]
 ecoRIsiteInvert = ecoRIsite[::-1]
 endPos0 = seqDNAinvert.find(ecoRIsiteInvert)
 endPos = int(seqLEN) - int(endPos0)
-print(endPos)
+inicioendPos = endPos - len(ecoRIsite)
+print("A clivagem final se dá em: ", inicioendPos, endPos)
