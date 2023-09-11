@@ -30,3 +30,6 @@ print("A sua nova lista de coisas favoritas é: ", list_favThings)
 list_favThings.pop(1)
 print("Removendo o segundo valor")
 print("A sua nova lista de coisas favoritas é: ", list_favThings)
+separator = ", "
+ListaDeFavoritos = separator.join(list_favThings)
+print("A sua lista atualizada de coisas favoritas transformada em string é: ", ListaDeFavoritos)
