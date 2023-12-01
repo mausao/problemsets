@@ -7,20 +7,20 @@ except ImportError:
     print("A biblioteca 'openpyxl' é necessária para a utilização deste programa. Verifique se a mesma está instalada em seu sistema")
 #Biblioteca para manipular .xlsx
 
-#Excluir parte abaixo depois...
-try: 
-    import mantel
-except ImportError:
-    print("A biblioteca 'mantel' é necessária para a utilização deste programa. Caso queira instalá-la, é necessário utilizar o comando 'pip install mantel' em seu prompt de comando")
-#Biblioteca para calculo da distância entre matrizes (software mantel)
-#Através dessa biblioteca não consegui realizar o cálculo, uma vez que, na definição dessa biblioteca, o cálculo de Pearson é utilizado a partir de duas matrizes de distância e o que é calculado é sua correlação.
-
 try:
     import numpy as np
     from scipy.stats import pearsonr
 except ImportError:
     print("A biblioteca 'scipy' é necessária para a utilização deste programa. Caso queira instalá-lo, é necessário utilizar o comando 'pip install scipy' em seu prompt de comando")
 #Biblioteca para o calculo de correlação de Pearson
+
+try:
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    import pandas as pd
+except ImportError:
+    print("Pacote seaborn ausente")
+#Biblioteca para plotagem de um heatmap com os resultados do teste de correlação de Pearson
 
 planilha = sys.argv[1]
 
@@ -53,7 +53,9 @@ def mean_grouped(dados):
 try:
     matrizes = []
     nomes_paginas = ['FvFm', 'ChlIdx', 'AriIdx']
-#lista das matrizes geradas para comparação pelo mantel.test
+#lista das matrizes geradas para comparação
+    matriz_correlacao = np.zeros((len(nomes_paginas), len(nomes_paginas)))
+#matriz de correlação para plotagem do heatmap - np.zeros cria uma matriz preenchida por zeros
     arquivo = openpyxl.load_workbook(planilha)
     print(f"O arquivo foi aberto e salvo com sucesso!\n")
     pages_names = arquivo.sheetnames
@@ -76,12 +78,23 @@ try:
             print(row_edit)
         print("\n")
     print(matrizes)
-    
+    print("\n")
+
     for i in range(len(nomes_paginas)):
         for j in range(i+1, len(nomes_paginas)):
             nome1, nome2 = nomes_paginas[i], nomes_paginas[j]
             correlacao = pearsonr(np.array(matrizes[i]).flatten(), np.array(matrizes[j]).flatten())
             print(f"Correlação entre {nome1}, {nome2}: {correlacao}")
+            matriz_correlacao[i, j] = matriz_correlacao[j, i] = correlacao[0]
+#comparar nome1 com nome2 é o equivalente a comparar nome2 com nome1
+
+    correlacao_df = pd.DataFrame(matriz_correlacao, index = nomes_paginas, columns = nomes_paginas)
+
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(correlacao_df, annot=True, cmap='coolwarm', fmt=".2f", linewidths=.5)
+    plt.title('Matriz de Correlação entre as Páginas')
+    plt.savefig('correlation_heatmap.png')
+    
 
 except IOError as e:
     print(f"Erro ao ler o arquivo: {e}")
